@@ -8,7 +8,7 @@ end
 
 local static = _G
 
-if not http then print("HTTP is not enabled") os.shutdown() end
+if not http then print("HTTP is not enabled") error("HTTP is not enabled") end
 screenX, screenY = term.getSize()
  
 function wrap(str, limit, indent, indent1)
@@ -37,29 +37,28 @@ function updateScript(oScript, sBranch)
         local sLocalFile = oScript.rename
         if not sLocalFile then sLocalFile = sFile end
         local sDir = oScript.dir
-        if not sDir then sDir = "/"
-            --todo: double check that sDir ends with a path char
-            print( sFile )
-            local response = http.get( git.gitUrl .. git.baseUrl .. sDir .. sFile .. "?access_token=" .. git.accessToken )
+        if not sDir then sDir = "/" end
+        --todo: double check that sDir ends with a path char
+        print( sDir .. sFile )
+        local url = git.gitUrl .. git.baseUrl .. "/" .. sBranch .. sDir .. sFile .. "?access_token=" .. git.accessToken
+        local response = http.get( url )
 
-            if response then
-                print( "success" )
-            else
-                print( "failure... shutting down" )
-                os.shutdown()
-            end
-            local script = response.readAll()
-            response.close()
+        if response then
+            print( "success" )
+        else
+            error( "failure... url: " + url )
+        end
+        local script = response.readAll()
+        response.close()
 
-            if not fs.exists( sDir ) then
-                fs.makeDir( sDir )
-            end
+        if not fs.exists( sDir ) then
+            fs.makeDir( sDir )
+        end
 
-            local file = fs.open( sDir .. sFile , "w" )
-            file.write( script )
-            file.close()
-            print("script updated")
-	    end
+        local file = fs.open( sDir .. sLocalFile , "w" )
+        file.write( script )
+        file.close()
+        print("script updated")
     end
 end
 function menu(oScripts)
@@ -136,14 +135,14 @@ end
 shell.run("/data/update/git.config")
 
 print("Grabbing list of scripts...")
-updateScript( { file="scripts.lua" , dir="/data/update/" } )
+updateScript( { file="scripts.data" , dir="/data/update/" } )
  
-shell.run("/data/update/scripts.lua")
+shell.run("/data/update/scripts.data")
 
 local scripts = static.scripts
 option = menu( scripts )
 if option == #scripts then
-	error()
+	error("invalid selection")
 else
 	updateScript( scripts[ n ] )
 end
