@@ -1,14 +1,12 @@
 args = {...}
- 
+
 local updateAll = false
- 
+
 if args[1] == "--all" then
     updateAll = true
 end
 
-local static = _G
-
-if not http then print("HTTP is not enabled") error("HTTP is not enabled") end
+if not http then error("HTTP is not enabled") end
 screenX, screenY = term.getSize()
  
 function wrap(str, limit, indent, indent1)
@@ -24,8 +22,7 @@ function wrap(str, limit, indent, indent1)
 			end
 		end)
 end
-function updateScript(oScript, sBranch)
-    local git = static.git
+function updateScript( oGit , oScript, sBranch )
 	if not sBranch then
 		sBranch = "master"
 	end
@@ -40,7 +37,7 @@ function updateScript(oScript, sBranch)
         if not sDir then sDir = "/" end
         --todo: double check that sDir ends with a path char
         print( sDir .. sFile )
-        local url = git.gitUrl .. git.baseUrl .. "/" .. sBranch .. sDir .. sFile .. "?access_token=" .. git.accessToken
+        local url = oGit.gitUrl .. oGit.baseUrl .. "/" .. sBranch .. sDir .. sFile .. "?access_token=" .. oGit.accessToken
         local response = http.get( url )
 
         if response then
@@ -60,6 +57,12 @@ function updateScript(oScript, sBranch)
         file.close()
         print("script updated")
     end
+end
+function getObject( sFile )
+    local file = fs.open( sFile , "r" )
+    local content = file.readAll()
+    file.close()
+    return textutils.unserialize( content )
 end
 function menu(oScripts)
     --indicates the currently selected script in the menu
@@ -132,17 +135,16 @@ end
 --todo: prompt for data if git.config doesn't exist
 --load config data for git, should bind a table named 'git' to global with .baseUrl and .accessToken
 -- accessToken needs to be a valid oAuth token from git
-shell.run("/data/update/git.config")
+local git = getObject( "/data/update/git.config" )
 
 print("Grabbing list of scripts...")
-updateScript( { file="scripts.data" , dir="/data/update/" } )
- 
-shell.run("/data/update/scripts.data")
+updateScript( git , { file="scripts.data" , dir="/data/update/" } )
 
-local scripts = static.scripts
+local scripts = getObject( "/data/update/scripts.data" )
+
 option = menu( scripts )
 if option == #scripts then
 	error("invalid selection")
 else
-	updateScript( scripts[ n ] )
+	updateScript( git , scripts[ n ] )
 end
