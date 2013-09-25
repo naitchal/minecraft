@@ -34,12 +34,13 @@ function updateScript(oScript, sBranch)
 		print("")
     else
         local sFile = oScript.file
+        local sLocalFile = oScript.rename
+        if not sLocalFile then sLocalFile = sFile end
         local sDir = oScript.dir
         if not sDir then sDir = "/"
             --todo: double check that sDir ends with a path char
-            local sPath = sDir .. sFile
             print( sFile )
-            local response = http.get( git.baseUrl .. sPath .. "?access_token=" .. git.accessToken )
+            local response = http.get( git.gitUrl .. git.baseUrl .. sDir .. sFile .. "?access_token=" .. git.accessToken )
 
             if response then
                 print( "success" )
@@ -54,7 +55,7 @@ function updateScript(oScript, sBranch)
                 fs.makeDir( sDir )
             end
 
-            local file = fs.open( sPath , "w" )
+            local file = fs.open( sDir .. sFile , "w" )
             file.write( script )
             file.close()
             print("script updated")
@@ -129,15 +130,15 @@ function menu(oScripts)
 	term.clear() term.setCursorPos(1,1)
 	return n
 end
-
+--todo: prompt for data if git.config doesn't exist
 --load config data for git, should bind a table named 'git' to global with .baseUrl and .accessToken
 -- accessToken needs to be a valid oAuth token from git
 shell.run("/data/update/git.config")
 
 print("Grabbing list of scripts...")
-updateScript( { file="scripts.lua" } )
+updateScript( { file="scripts.lua" , dir="/data/update/" } )
  
-shell.run("scripts.lua")
+shell.run("/data/update/scripts.lua")
 
 local scripts = static.scripts
 option = menu( scripts )
