@@ -1,4 +1,4 @@
-scripts = {
-    { name = "update" , file="update.lua" , desc = "Update this program" },
+_G.scripts = {
+    { name = "update" , file="update.lua" , rename="update" , desc = "Update this program" },
     { name = "Exit Updater" , file="Exit" , desc = "Exit the updater" },
 }
