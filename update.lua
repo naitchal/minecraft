@@ -155,13 +155,13 @@ local scripts = getObject("/data/update/scripts.data")
 if updateAll then
   local len = #scripts
   for i = 1,len do
-    updateScript( scripts[i] )
+    updateScript( git , scripts[i] )
   end
 else
   option = menu(scripts)
   if option == #scripts then
     print("")
   else
-    updateScript(git, scripts[n])
+    updateScript( git , scripts[n] )
   end
 end
