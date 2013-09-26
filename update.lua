@@ -37,7 +37,11 @@ function updateScript(oGit, oScript, sBranch)
     local sDir = oScript.dir
     if not sDir then sDir = "/" end
     --todo: double check that sDir ends with a path char
-    print(sDir .. sFile)
+    if sLocalFile == sFile then
+      print(sDir .. sFile )
+    else
+      print( sDir .. sFile .. "->" .. sLocalFile )
+    end
     local url = oGit.gitUrl .. oGit.baseUrl .. "/" .. sBranch .. sDir .. sFile .. "?access_token=" .. oGit.accessToken
     local response = http.get(url)
 
@@ -148,9 +152,16 @@ updateScript(git, { file = "scripts.data", dir = "/data/update/" })
 
 local scripts = getObject("/data/update/scripts.data")
 
-option = menu(scripts)
-if option == #scripts then
-  error("invalid selection")
+if updateAll then
+  local len = #scripts
+  for i = 1,len do
+    updateScript( scripts[i] )
+  end
 else
-  updateScript(git, scripts[n])
+  option = menu(scripts)
+  if option == #scripts then
+    print("")
+  else
+    updateScript(git, scripts[n])
+  end
 end
