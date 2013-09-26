@@ -90,6 +90,7 @@ function menu(oScripts)
     end
     -- Get longest key
     local longestLen = 0
+    local l = #oScripts
     local printStr
     for i = 1, l do
       local len = #oScripts[i].name;
@@ -98,15 +99,14 @@ function menu(oScripts)
 
     --indicates the currently selected script in the menu
     local n = 1
-    local l = #oScripts
     for i = 1, l do
       local script = oScripts[i]
+      local name = script.name
+      local desc = script.desc
       if i == n then
-        local name = script.name
-        local desc = script.desc
         local spaceCount = #name - longestLen
         if spaceCount < 0 then spaceCount = -(spaceCount) end
-        local printStr = i .. " [ " .. name
+        printStr = i .. " [ " .. name
         for k = 1, spaceCount do
           printStr = printStr .. " "
         end
@@ -114,11 +114,11 @@ function menu(oScripts)
         oldX, oldY = term.getCursorPos()
         term.setTextColor(colors.cyan)
         term.setCursorPos(1, 17)
-        print(wrap(script.desc, 45, "", ""))
+        print(wrap(desc, 45, "", ""))
         term.setCursorPos(oldX, oldY)
         term.setTextColor(colors.blue)
       else
-        printStr = i .. "   " .. script.desc
+        printStr = i .. "   " .. name
       end
       if term.isColor() == true then term.setTextColor(colors.lightBlue) end
       print( printStr )
@@ -132,6 +132,8 @@ function menu(oScripts)
       if b == 200 and n > 1 then n = n - 1 end
       if b == 208 and n < l then n = n + 1 end
       if b == 28 then break end
+      print( b )
+      os.sleep( 1 )
     end
   end
   term.clear() term.setCursorPos(1, 1)
