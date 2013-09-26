@@ -68,6 +68,8 @@ function getObject(sFile)
 end
 
 function menu(oScripts)
+  --indicates the currently selected script in the menu
+  local n = 1
   while true do
     term.clear()
     term.setCursorPos(1, 1)
@@ -75,17 +77,17 @@ function menu(oScripts)
       term.setTextColor(colors.cyan)
       term.write("###################################################")
       term.setCursorPos(1, 2)
-      term.write("#         ")
+      term.write("#              ")
       term.setTextColor(colors.blue)
-      term.write("THUNDERGROOVE's  Script updater")
+      term.write("Github Script updater")
       term.setTextColor(colors.cyan)
-      term.write("         #")
+      term.write("              #")
       term.setCursorPos(1, 3)
       term.setTextColor(colors.cyan)
       term.write("###################################################")
     else
       print("#######################################")
-      print("#   THUNDERGROOVE's  Script updater #")
+      print("#            Github  Script updater #")
       print("#######################################")
     end
     -- Get longest key
@@ -97,8 +99,6 @@ function menu(oScripts)
       if len > longestLen then longestLen = len end
     end
 
-    --indicates the currently selected script in the menu
-    local n = 1
     for i = 1, l do
       local script = oScripts[i]
       local name = script.name
@@ -132,8 +132,6 @@ function menu(oScripts)
       if b == 200 and n > 1 then n = n - 1 end
       if b == 208 and n < l then n = n + 1 end
       if b == 28 then break end
-      print( b )
-      os.sleep( 1 )
     end
   end
   term.clear() term.setCursorPos(1, 1)
